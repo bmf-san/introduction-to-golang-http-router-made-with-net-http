@@ -1,7 +1,6 @@
 package myrouter
 
 import (
-	"errors"
 	"net/http"
 	"strings"
 )
@@ -101,7 +100,7 @@ func (t *tree) Search(method string, path string) (*result, error) {
 				if p == curNode.label {
 					break
 				} else {
-					return nil, errors.New("no matching route was found")
+					return nil, ErrNotFound
 				}
 			}
 			curNode = nextNode
@@ -111,7 +110,7 @@ func (t *tree) Search(method string, path string) (*result, error) {
 	result.actions = curNode.actions[method]
 	if result.actions == nil {
 		// no matching handler was found.
-		return nil, errors.New("methods is not allowed")
+		return nil, ErrMethodNotAllowed
 	}
 	return result, nil
 }
