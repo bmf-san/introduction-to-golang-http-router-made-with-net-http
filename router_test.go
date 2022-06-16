@@ -114,16 +114,18 @@ func TestRouter(t *testing.T) {
 }
 
 func TestHandleErr(t *testing.T) {
+	Code405, _ := handleErr(ErrMethodNotAllowed)
+	Code404, _ := handleErr(ErrNotFound)
 	cases := []struct {
 		actual   int
 		expected int
 	}{
 		{
-			actual:   handleErr(ErrMethodNotAllowed),
+			actual:   Code405,
 			expected: http.StatusMethodNotAllowed,
 		},
 		{
-			actual:   handleErr(ErrNotFound),
+			actual:   Code404,
 			expected: http.StatusNotFound,
 		},
 	}
