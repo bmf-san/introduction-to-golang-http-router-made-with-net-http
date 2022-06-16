@@ -5,6 +5,19 @@ import (
 	"net/http"
 )
 
+var (
+	Http404Response = []byte("page not found")
+	Http405Response = []byte("method not allowed")
+)
+
+func Set404(content string) {
+	Http404Response = []byte(content)
+}
+
+func Set405(content string) {
+	Http404Response = []byte(content)
+}
+
 // Router represents the router which handles routing.
 type Router struct {
 	tree *tree
@@ -56,21 +69,25 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	path := req.URL.Path
 	result, err := r.tree.Search(method, path)
 	if err != nil {
-		status := handleErr(err)
+		status, msg := handleErr(err)
 		w.WriteHeader(status)
+		w.Write(msg)
 		return
 	}
 	h := result.actions.handler
 	h.ServeHTTP(w, req)
 }
 
-func handleErr(err error) int {
+func handleErr(err error) (int, []byte) {
 	var status int
+	var body []byte
 	switch err {
 	case ErrMethodNotAllowed:
 		status = http.StatusMethodNotAllowed
+		body = Http405Response
 	case ErrNotFound:
 		status = http.StatusNotFound
+		body = Http404Response
 	}
-	return status
+	return status, body
 }
